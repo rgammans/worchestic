@@ -4,7 +4,7 @@ Worchestic
 
 ..  image:: https://github.com/rgammans/worchestic/actions/workflows/unittest.yml/badge.svg
     :alt: Python package tests
-    :target: https://github.com/rgammans/succession/actions/workflows/unittest.yml
+    :target: https://github.com/rgammans/worchestic/actions/workflows/unittest.yml
 
 Worchestic is a controller for signal switch fabrics, for connection 
 orientated switching, such as traditional telephone systems or video
