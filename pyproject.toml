@@ -3,7 +3,21 @@ name = "worchestic"
 description = "A generic controller for a switch fabric"
 version = "0.1.0"
 readme = "README,rst"
+license = {file = "LICENSE"}
+authors = [
+  {name = "Roger Gammans", email = "rgammans@gammascience.co.uk"},
+]
+keywords = ['routing', 'switch', 'kvm', 'hardware' ]
 
+classifiers = [
+    "Intended Audience :: Manufacturing",
+    "Intended Audience :: Telecommunications Industry",
+    "Intended Audience :: Other Audience",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Programming Language :: Python :: 3",
+    "Development Status :: 2 - Pre-Alpha",
+    "Topic :: Other/Nonlisted Topic"
+]
 dependencies = [
     "atomicx"
 ]
