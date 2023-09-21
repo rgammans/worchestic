@@ -1,0 +1,24 @@
+[project]
+name = "worchestic"
+description = "A generic controller for a switch fabric"
+version = "0.1.0"
+readme = "README,rst"
+
+dependencies = [
+    "atomicx"
+]
+
+[build-system]
+requires = ["setuptools", "wheel" ]
+build-backend = "setuptools.build_meta"
+
+[tool.tox]
+legacy_tox_ini = """
+    [tox]
+
+    envlist = py39
+
+    [testenv]
+    commands = 
+        python -m unittest discover -s tests
+"""
