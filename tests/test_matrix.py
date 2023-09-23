@@ -1,6 +1,6 @@
 from unittest import TestCase, skip
 from unittest.mock import Mock
-from worchestic.vid_matrix import Matrix, MatrixOutput, LockedOutput, AlreadyUnlocked
+from worchestic.matrix import Matrix, MatrixOutput, LockedOutput, AlreadyUnlocked
 from worchestic.signals import Source
 
 
