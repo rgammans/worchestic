@@ -1,10 +1,10 @@
 .*\.py[co~]$
 .*~
-^generated/.*
-.*\.sw[ponm]$
-^build/.*
+.*.sw[mnop]
+generated/.*
+build/.*
 *.egg-info/
-^dist/
-\.orig$
-\.old$
+dist/
+*.orig
+*.old
 \.tox/*
