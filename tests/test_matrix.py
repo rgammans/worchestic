@@ -1,13 +1,13 @@
 from unittest import TestCase, skip
 from unittest.mock import Mock
-from worchestic.matrix import Matrix, MatrixOutput, LockedOutput, AlreadyUnlocked
-from worchestic.signals import Source
+from worchestic.matrix import (
+    Matrix,
+    MatrixOutput,
+    LockedOutput,
+    AlreadyUnlocked,
+)
 
-
-def make_signal():
-    s = Source("")
-    s.name = str(s.uuid)
-    return s
+from utils import make_signal
 
 
 class MatrixOuputTests(TestCase):
@@ -49,7 +49,6 @@ class MatrixOuputTests(TestCase):
         self.o.release()
         self.o.select(make_signal())
 
-
     def test_unlock_doesnt_happen_if_release_arent_balanced(self):
         self.o.claim()
         self.o.claim()
@@ -63,10 +62,10 @@ class MatrixOuputTests(TestCase):
         self.o.release()
         self.assertFalse(self.o.locked)
 
-
     def test_releasing_an_unlocked_output_raises_AlreadyUnlocked(self):
         with self.assertRaises(AlreadyUnlocked):
             self.o.release()
+
 
 class SimpleMatrixTests(TestCase):
     def setUp(self):
@@ -95,13 +94,14 @@ class TwoLevelMatrixTests(TestCase):
     """Two level matrix checks the basic interactions
     bwtween matrix an outputs as inputs"""
     def setUp(self):
-#        self.driver = Mock()
         self.sources1 = [make_signal(), make_signal(), make_signal()]
         self.m1 = Matrix("m1", Mock(), self.sources1, 2)
         # Share the middle source on both leaf matricies
         self.sources2 = [self.sources1[1], make_signal()]
         self.m2 = Matrix("m2", Mock(), self.sources2, 2)
-        self.root_m = Matrix("root", Mock(), self.m1.outputs + self.m2.outputs, 3)
+        self.root_m = Matrix("root",
+                             Mock(),
+                             self.m1.outputs + self.m2.outputs, 3)
 
     def test_available_source_removes_repeated_options(self):
         self.assertSetEqual(self.root_m.available_sources,
@@ -178,9 +178,17 @@ class ThreeLevelMatrixTests(TestCase):
         self.m2 = Matrix("m2", Mock(), self.sources2, 2)
         self.sources3 = [make_signal(), make_signal()]
         self.m3 = Matrix("m3", Mock(), self.sources3, 2)
-        self.n1 = Matrix("n1", Mock(), self.m1.outputs + [self.m2.outputs[0]], 2)
-        self.n2 = Matrix("n2", Mock(), self.m3.outputs + [self.m2.outputs[1]], 2)
-        self.root_m = Matrix("root", Mock(), self.n1.outputs + self.n2.outputs, 3)
+        self.n1 = Matrix("n1",
+                         Mock(),
+                         self.m1.outputs + [self.m2.outputs[0]], 2)
+
+        self.n2 = Matrix("n2",
+                         Mock(),
+                         self.m3.outputs + [self.m2.outputs[1]], 2)
+
+        self.root_m = Matrix("root",
+                             Mock(),
+                             self.n1.outputs + self.n2.outputs, 3)
 
     def test_selecting_in_input_recursively_claims_outputs(self):
         self.root_m.select(0, self.sources1[0])
