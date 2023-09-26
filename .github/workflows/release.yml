@@ -13,10 +13,12 @@ jobs:
       name: pypi
       url: https://pypi.org/p/worchestic
     permissions:
-      id-token: {{ secrets.PYPI_TOKEN }} 
+      id-token: write
     steps:
     - name: Install the packaging-related tools
       run: python3 -m pip install build twine
+    - name: Checkout the repo
+      uses: actions/checkout@v2
     - name: Build the wheel
       run: python3 -m build
     - name: Sanity check the build
