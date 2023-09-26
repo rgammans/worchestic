@@ -2,7 +2,7 @@
 name = "worchestic"
 description = "A generic controller for a switch fabric"
 version = "0.1.0"
-readme = "README,rst"
+readme = "README.rst"
 license = {file = "LICENSE"}
 authors = [
   {name = "Roger Gammans", email = "rgammans@gammascience.co.uk"},
