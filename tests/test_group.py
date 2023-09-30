@@ -71,3 +71,11 @@ class MatrixGroupTest(TestCase):
 
         usb_sel.assert_called_once_with(0, self.usb[0])
         vid_sel.assert_called_once_with(1, self.video[0])
+
+    def test_get_outpots_returns_indexed_ouptut_from_named_matrix(self):
+        mname = "video"
+        index = 1
+        self.assertIs(
+            self.mgroup.get_output(mname, index),
+            self.mat_video.outputs[index]
+        )

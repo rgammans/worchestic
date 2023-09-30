@@ -40,3 +40,6 @@ class MatrixGroup:
                 outp = other_src.preferred_out
                 if outp and outp is not mat_out:
                     outp.select(other_src, nolock=True)
+
+    def get_output(self, name, idx: int):
+        return self.matricies[name].outputs[idx]
