@@ -47,15 +47,15 @@ class MatrixGroupTest(TestCase):
         )
 
     def test_selecting_a_source_selects_it_in_the_matrix_and_nothing_else_if_no_companions_is_true(self):
-        with patch.object(self.mat_video, "select") as vid_sel:
+        with patch.object(self.mat_video, "_select") as vid_sel:
             self.mgroup.select("video", 0, self.video[0], no_companions=True)
 
         self.mat_usb._driver.assert_not_called()
         vid_sel.assert_called_once_with(0, self.video[0])
 
     def test_selecting_a_source_selects_it_in_the_matrix_and_companions_is_default(self):
-        with patch.object(self.mat_video, "select") as vid_sel, \
-             patch.object(self.mat_usb, "select") as usb_sel:
+        with patch.object(self.mat_video, "_select") as vid_sel, \
+             patch.object(self.mat_usb, "_select") as usb_sel:
             self.mgroup.select("video", 0, self.video[0])
 
         usb_sel.assert_called_once_with(0, self.usb[0])
@@ -65,8 +65,8 @@ class MatrixGroupTest(TestCase):
         ])
 
     def test_selecting_a_source_selects_it_in_the_matrix_and_skip_companons_for_the_chosen_output(self):
-        with patch.object(self.mat_video, "select") as vid_sel, \
-             patch.object(self.mat_usb, "select") as usb_sel:
+        with patch.object(self.mat_video, "_select") as vid_sel, \
+             patch.object(self.mat_usb, "_select") as usb_sel:
             self.mgroup.select("video", 1, self.video[0])
 
         usb_sel.assert_called_once_with(0, self.usb[0])

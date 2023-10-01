@@ -54,7 +54,7 @@ class MatrixOutput:
         if src.uuid != self.uuid:
             if self.locked:
                 raise LockedOutput(f"{self} is locked/in use")
-            self._device.select(self._idx, src)
+            self._device._select(self._idx, src)
             self._source = src
         if not nolock:
             self.claim()
@@ -131,6 +131,10 @@ class Matrix:
 
         Propagates up the switch fabric as necessary.
         """
+        self.outputs[idx].select(source, nolock=True)
+
+    def _select(self, idx, source: Source):
+        "internal select function"
         logger.info(f"{self}: assigning {idx} to {source.uuid}")
         self.release(idx)
 

@@ -18,7 +18,7 @@ class MatrixOuputTests(TestCase):
     def test_output_select_forwards_call_to_matrix(self):
         source = make_signal()
         self.o.select(source)
-        self.o._device.select.assert_called_with(self.idx, source)
+        self.o._device._select.assert_called_with(self.idx, source)
 
     def test_output_select_locks_output(self):
         source = make_signal()
@@ -88,6 +88,10 @@ class SimpleMatrixTests(TestCase):
         m2 = Matrix("m2", Mock(), sources2, 2)
         master = Matrix("master", Mock(), self.m.outputs + m2.outputs, 2)
         self.assertTrue(master)
+
+    def test_select_on_single_matrix_updates_the_source_of_the_output(self):
+        self.m.select(1, self.sources[0])
+        self.assertEqual(self.m.outputs[1].source, self.sources[0])
 
 
 class TwoLevelMatrixTests(TestCase):
