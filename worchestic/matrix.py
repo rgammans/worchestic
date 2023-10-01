@@ -41,6 +41,10 @@ class MatrixOutput:
         return bool(self._sem.load())
 
     @property
+    def source(self):
+        return self._source
+
+    @property
     def uuid(self):
         """Unique Identifier for the current signal on this output/cable"""
         return self._source and self._source.uuid
