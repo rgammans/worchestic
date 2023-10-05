@@ -4,6 +4,10 @@ from contextlib import suppress
 class SourceGroup:
     def __init__(self, /, **kwargs):
         self.groups = kwargs
+        if assignments := kwargs.get('assign_outputs'):
+            for grp, output in assignments.items():
+                for signal in self.groups[grp]:
+                    signal.preferred_out = output
 
     def get_companions(self, source):
         idx = None
@@ -40,6 +44,8 @@ class MatrixGroup:
                 outp = other_src.preferred_out
                 if outp and outp is not mat_out:
                     outp.select(other_src, nolock=True)
+                else:
+                    print(f"skipping {other_src}, no pref output")
 
     def get_output(self, name, idx: int):
         return self.matricies[name].outputs[idx]

@@ -24,6 +24,32 @@ class SourceGroupTest(TestCase):
                             companions_0)
 
 
+class SingalGroupInitTests(TestCase):
+    def test_assign_out_set_preferred_ouptut(self):
+        self.video = [make_signal(), make_signal(), make_signal(), make_signal()]
+        self.usb = [make_signal(), make_signal(), make_signal(), make_signal()]
+        self.mat_video = Matrix("video", Mock(), self.video, 2)
+        self.mat_usb = Matrix("usb", Mock(), self.usb, 1)
+        self.signal_group = SourceGroup(
+                    video_a=self.video[:2],
+                    video_b=self.video[2:],
+                    usb=self.usb,
+                    assign_outputs={
+                        'usb': self.mat_usb.outputs[0],
+                        'video_a': self.mat_video.outputs[0],
+                        'video_b': self.mat_video.outputs[1],
+
+                    }
+        )
+        for i, signal in enumerate(self.video):
+            self.assertEqual(
+                signal.preferred_out, self.mat_video.outputs[i // 2]
+            )
+        for i, signal in enumerate(self.usb):
+            self.assertEqual(signal.preferred_out, self.mat_usb.outputs[0])
+
+
+
 class MatrixGroupTest(TestCase):
     def setUp(self):
         self.video = [make_signal(), make_signal(), make_signal(), make_signal()]
