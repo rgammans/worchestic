@@ -4,7 +4,7 @@ from contextlib import suppress
 class SourceGroup:
     def __init__(self, /, **kwargs):
         self.groups = kwargs
-        if assignments := kwargs.get('assign_outputs'):
+        if assignments := kwargs.pop('assign_outputs', None):
             for grp, output in assignments.items():
                 for signal in self.groups[grp]:
                     signal.preferred_out = output
