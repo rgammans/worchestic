@@ -220,3 +220,9 @@ class ThreeLevelMatrixTests(TestCase):
                 # Count locked outputs
                 sum(1 for o in self.m1.outputs if o.locked)
         )
+
+    def test_updating_a_selected_input_source_cascades_to_the_output(self,):
+        self.root_m.select(0, self.sources1[0])
+        self.assertEqual(self.root_m.outputs[0].uuid, self.sources1[0].uuid)
+        self.m1.replug_input(0, self.sources3[-1])
+        self.assertEqual(self.root_m.outputs[0].uuid, self.sources3[-1].uuid)

@@ -3,11 +3,12 @@
 from contextlib import suppress
 from dataclasses import dataclass
 from typing import Union, ForwardRef
-from .signals import Source
+from .signals import Source, Sink
 from atomicx import AtomicInt
 import logging
 
 logger = logging.getLogger(__name__)
+
 
 class LockedOutput(ValueError):
     pass
@@ -20,14 +21,25 @@ class AlreadyUnlocked(ValueError):
 class UnroutableOutput(ValueError):
     pass
 
+
 class MatrixOutput:
     """A Matrix output is a source, which is
     the output of a specrific discoverable matrix"""
-    def __init__(self, device: ForwardRef('Matrix'), idx: int):
+    def __init__(self, device: ForwardRef('Matrix'),
+                 idx: int, sink: Sink = None):
         self._source = None
         self._sem = AtomicInt(0)
         self._device = device
         self._idx = idx
+        self.connection = None
+
+    def connected_to(self, sink):
+        self.connection = sink
+
+    def _source_changed(self, source):
+        if self._source is not source:
+            self._source = source
+            self.connection and self.connection.source_changed(source)
 
     def __str__(self):
         return f"{self._device.name}.outputs[{self._idx}]"
@@ -55,7 +67,7 @@ class MatrixOutput:
             if self.locked:
                 raise LockedOutput(f"{self} is locked/in use")
             self._device._select(self._idx, src)
-            self._source = src
+            self._source_changed(src)
         if not nolock:
             self.claim()
 
@@ -84,6 +96,14 @@ InputSignal = Union[MatrixOutput, Source]
 class Matrix:
     """An instance of this class
     represents a single switch element"""
+    class Input:
+        def __init__(self, matrix, idx):
+            self.matrix = matrix
+            self.idx = idx
+
+        def source_changed(self, src):
+            self.matrix._input_changed(self.idx, src)
+
     def __init__(self, name: str, driver: MatrixDriver, inputs: InputSignal,
                  nr_outputs: int):
         self.name = name
@@ -93,6 +113,10 @@ class Matrix:
         self._current = {}
         for idx in range(nr_outputs):
             self.outputs[idx] = MatrixOutput(self, idx)
+
+        for idx, source in enumerate(self.inputs):
+            if isinstance(source, MatrixOutput):
+                source.connected_to(self.Input(self, idx))
 
     def __str__(self):
         return self.name
@@ -125,6 +149,18 @@ class Matrix:
                                                inp, source.source)
             else:
                 yield self.AvailableSource(idx, 1, inp, inp)
+
+    def _input_changed(self, idx, source):
+        for out, inp in self._current.items():
+            #if self.outputs[out].locked:
+            #    raise LockedOutput(f"Input {idx} is used by locked output {self.outputs[out]}")
+            if idx == inp:
+                self.outputs[out]._source_changed(source)
+
+    def replug_input(self, idx, source):
+        """Changes the input found on a source"""
+        self._input_changed(idx, source)
+        self.inputs[idx] = source
 
     def select(self, idx, source: Source):
         """Sets output (idx) to connect to source
