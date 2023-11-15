@@ -105,3 +105,7 @@ class MatrixGroupTest(TestCase):
             self.mgroup.get_output(mname, index),
             self.mat_video.outputs[index]
         )
+
+    def test_matrixgroup_has_and_available_method_which_it_calls_on_the_sub_matricies(self):
+        kbds = self.mgroup.available('usb')
+        self.assertSetEqual(kbds, set(self.usb))

@@ -49,3 +49,6 @@ class MatrixGroup:
 
     def get_output(self, name, idx: int):
         return self.matricies[name].outputs[idx]
+
+    def available(self, group):
+        return self.matricies[group].available_sources
