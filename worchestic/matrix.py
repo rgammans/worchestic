@@ -148,7 +148,8 @@ class Matrix:
                     yield self.AvailableSource(idx, source.path_len + 1,
                                                inp, source.source)
             else:
-                yield self.AvailableSource(idx, 1, inp, inp)
+                if inp is not None:
+                    yield self.AvailableSource(idx, 1, inp, inp)
 
     def _input_changed(self, idx, source):
         for out, inp in self._current.items():

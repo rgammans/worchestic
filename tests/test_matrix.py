@@ -70,14 +70,19 @@ class MatrixOuputTests(TestCase):
 class SimpleMatrixTests(TestCase):
     def setUp(self):
         self.driver = Mock()
-        self.sources = [make_signal(), make_signal()]
+        self.sources = [make_signal(), make_signal(), None]
         self.m = Matrix("simple", self.driver, self.sources, 2)
 
     def test_matrix_is_truthy(self):
         self.assertTrue(self.m)
 
-    def test_aavailable_source_with_no_cascade(self):
-        self.assertSetEqual(self.m.available_sources, set(self.sources))
+    def test_aavailable_source_with_no_cascade_reports_valid_inputs(self):
+        self.assertSetEqual(self.m.available_sources,
+                            set([
+                                s for s in
+                                self.sources
+                                if s is not None
+                            ]))
 
     def test_select_on_single_matrix_calls_the_driver(self):
         self.m.select(1, self.sources[0])
