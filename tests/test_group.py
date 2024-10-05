@@ -10,8 +10,8 @@ class SourceGroupTest(TestCase):
         self.video = [make_signal(), make_signal(), make_signal()]
         self.usb = [make_signal(), make_signal(), make_signal()]
         self.signal_group = SourceGroup(
-                    video_a=self.video[:2],
-                    video_b=self.video[2:],
+                    video_a=self.video[:2] + [None, None],
+                    video_b=self.video[2:] + [None, None],
                     usb=self.usb
         )
 
@@ -23,6 +23,8 @@ class SourceGroupTest(TestCase):
         self.assertSetEqual(set(self.signal_group.get_companions(self.video[0])),
                             companions_0)
 
+    def test_none_values_are_not_valid_companions(self):
+        self.assertEqual(len(self.signal_group.get_companions(self.usb[2])),0)
 
 class SingalGroupInitTests(TestCase):
     def test_assign_out_set_preferred_ouptut(self):
@@ -55,8 +57,8 @@ class MatrixGroupTest(TestCase):
         self.video = [make_signal(), make_signal(), make_signal(), make_signal()]
         self.usb = [make_signal(), make_signal(), make_signal(), make_signal()]
         self.signal_group = SourceGroup(
-                    video_a=self.video[:2],
-                    video_b=self.video[2:],
+                    video_a=self.video[:2] + [None, None],
+                    video_b=self.video[2:] + [None, None],
                     usb=self.usb
         )
         self.mat_video = Matrix("video", Mock(), self.video, 2)
@@ -65,7 +67,8 @@ class MatrixGroupTest(TestCase):
             hid.preferred_out = self.mat_usb.outputs[0]
 
         for idx, screen in enumerate(self.video):
-            screen.preferred_out = self.mat_video.outputs[idx // 2]
+            if screen:
+                screen.preferred_out = self.mat_video.outputs[idx // 2]
 
         self.mgroup = MatrixGroup(
                 self.signal_group,
@@ -89,6 +92,14 @@ class MatrixGroupTest(TestCase):
                 call(0, self.video[0]),
                 call(1, self.video[2]),
         ])
+
+    def test_selecting_a_source_selects_it_in_the_matrix_and_companions_if_exists(self):
+        with patch.object(self.mat_video, "_select") as vid_sel, \
+             patch.object(self.mat_usb, "_select") as usb_sel:
+            self.mgroup.select("usb", 0, self.usb[2])
+
+        usb_sel.assert_called_once_with(0, self.usb[2])
+        vid_sel.assert_not_called()
 
     def test_selecting_a_source_selects_it_in_the_matrix_and_skip_companons_for_the_chosen_output(self):
         with patch.object(self.mat_video, "_select") as vid_sel, \

@@ -21,7 +21,7 @@ class SourceGroup:
             for sourceset in self.groups.values():
                 with suppress(IndexError):
                     companion = sourceset[idx]
-                    if companion is not source:
+                    if companion is not None and companion is not source:
                         rv.add(companion)
             return rv
 
@@ -41,6 +41,7 @@ class MatrixGroup:
         if not no_companions:
             companions = self.signals.get_companions(src)
             for other_src in companions:
+                # Skip if no grouped signal for this poisition
                 outp = other_src.preferred_out
                 if outp and outp is not mat_out:
                     outp.select(other_src, nolock=True)
