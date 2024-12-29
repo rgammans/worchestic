@@ -1,8 +1,9 @@
 .*\.py[co~]$
-.*~
+*~
 .*.sw[mnop]
 generated/.*
-build/.*
+__pycache__/
+build/
 *.egg-info/
 dist/
 *.orig
