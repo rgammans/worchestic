@@ -10,7 +10,7 @@ from worchestic.matrix import (
 from utils import make_signal
 
 
-class MatrixOuputTests(TestCase):
+class MatrixOutputTests(TestCase):
     def setUp(self):
         self.idx = 0
         self.o = MatrixOutput(Mock(), self.idx)
@@ -25,7 +25,7 @@ class MatrixOuputTests(TestCase):
         self.o.select(source)
         self.assertTrue(self.o.locked)
 
-    def test_output_select_sets_sources_atttribute(self):
+    def test_output_select_sets_sources_attribute(self):
         source = make_signal()
         self.o.select(source)
         self.assertEqual(self.o._source, source)
@@ -39,7 +39,7 @@ class MatrixOuputTests(TestCase):
         self.o.claim()
         self.assertTrue(self.o.locked)
 
-    def test_selecting_on_a_locked_outout_raises_LockedOutput(self):
+    def test_selecting_on_a_locked_output_raises_LockedOutput(self):
         self.o.select(make_signal())
         with self.assertRaises(LockedOutput):
             self.o.select(make_signal())
@@ -76,7 +76,7 @@ class SimpleMatrixTests(TestCase):
     def test_matrix_is_truthy(self):
         self.assertTrue(self.m)
 
-    def test_aavailable_source_with_no_cascade_reports_valid_inputs(self):
+    def test_available_source_with_no_cascade_reports_valid_inputs(self):
         self.assertSetEqual(self.m.available_sources,
                             set([
                                 s for s in
@@ -101,11 +101,11 @@ class SimpleMatrixTests(TestCase):
 
 class TwoLevelMatrixTests(TestCase):
     """Two level matrix checks the basic interactions
-    bwtween matrix an outputs as inputs"""
+    between matrix an outputs as inputs"""
     def setUp(self):
         self.sources1 = [make_signal(), make_signal(), make_signal()]
         self.m1 = Matrix("m1", Mock(), self.sources1, 2)
-        # Share the middle source on both leaf matricies
+        # Share the middle source on both leaf matrices
         self.sources2 = [self.sources1[1], make_signal()]
         self.m2 = Matrix("m2", Mock(), self.sources2, 2)
         self.root_m = Matrix("root",
@@ -123,7 +123,7 @@ class TwoLevelMatrixTests(TestCase):
 
     def test_selecting_a_source_at_the_root_selects_it_at_the_leaf(self):
         self.root_m.select(0, self.sources1[1])
-        # Actaully  the driver being called with either (0,0), or (0,1)
+        # Actually  the driver being called with either (0,0), or (0,1)
         # is valid but it depends on the routing algo which one
         # is actually chosen - the current code chooses (0,0)
         self.root_m._driver.select.assert_called_with(0, 0)
@@ -152,12 +152,12 @@ class TwoLevelMatrixTests(TestCase):
         with self.assertRaises(Exception):
             self.root_m.select(2, self.sources1[2])
 
-    def test_reselecting_an_ouptut_works_if_resource_are_swapped(self):
+    def test_reselecting_an_output_works_if_resource_are_swapped(self):
         self.tie_up_m1()
         # Select a source only available on an m1 output
         self.root_m.select(1, self.sources1[2])
 
-    def test_reselecting_an_ouptut_releases_uinused_resources(self):
+    def test_reselecting_an_output_releases_unused_resources(self):
         self.tie_up_m1()
         # Select a source only available on an m1 output
         self.root_m.select(1, self.sources2[1])
@@ -167,9 +167,9 @@ class TwoLevelMatrixTests(TestCase):
                 sum(1 for o in self.m1.outputs if o.locked)
         )
 
-    def test_selecting_an_ouptut_as_a_mirror_claims_and_existing_input(self):
+    def test_selecting_an_output_as_a_mirror_claims_and_existing_input(self):
         self.tie_up_m1()
-        # Select an alreay in use source
+        # Select an already in use source
         self.root_m.select(0, self.sources1[0])
         self.assertFalse(self.m1.outputs[0].locked)
         self.assertEqual(self.m1.outputs[1]._sem.load(), 2)

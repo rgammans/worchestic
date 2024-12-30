@@ -1,8 +1,8 @@
-# vid_matrix.py - Video matrix controll logic
+# vid_matrix.py - Video matrix control logic
 
 from contextlib import suppress
 from dataclasses import dataclass
-from typing import Union, ForwardRef
+from typing import Union
 from .signals import Source, Sink
 from atomicx import AtomicInt
 import logging
@@ -24,8 +24,8 @@ class UnroutableOutput(ValueError):
 
 class MatrixOutput:
     """A Matrix output is a source, which is
-    the output of a specrific discoverable matrix"""
-    def __init__(self, device: ForwardRef('Matrix'),
+    the output of a specific discoverable matrix"""
+    def __init__(self, device: 'Matrix',
                  idx: int, sink: Sink = None):
         self._source = None
         self._sem = AtomicInt(0)
@@ -61,8 +61,8 @@ class MatrixOutput:
         """Unique Identifier for the current signal on this output/cable"""
         return self._source and self._source.uuid
 
-    def select(self, src: ForwardRef('InputSignal'), nolock: bool = False):
-        """Select an alternate signal for this ouptut, locking the output"""
+    def select(self, src: 'InputSignal', nolock: bool = False):
+        """Select an alternate signal for this output, locking the output"""
         if src.uuid != self.uuid:
             if self.locked:
                 raise LockedOutput(f"{self} is locked/in use")
@@ -81,7 +81,12 @@ class MatrixOutput:
         self._device.release(self._idx)
 
     def claim(self):
-        """Claim a lock on the output"""
+        """Claim a lock on the output
+
+        A lock is claimed when the output is selected, by
+        by a downstream matrix, to prevent the output from being
+        selected being reassigning to a different source.    
+        """
         self._sem.inc()
 
 
@@ -138,7 +143,7 @@ class Matrix:
             if isinstance(inp, MatrixOutput):
                 if inp.locked:
                     # If the input is locked don't recurse.
-                    # but it is availibl itself.
+                    # but it is available itself.
                     logger.debug(f"locked - {idx}, {inp}")
                     yield self.AvailableSource(idx,  0, inp, inp._source)
                     continue
@@ -188,10 +193,10 @@ class Matrix:
         self._current[idx] = route.input_idx
 
     def release(self, idx):
-        """Releases a hold on any signal apatch which feed this input
+        """Releases a hold on any signal which feeds this input
 
            - Allows the currently used input for this output to be switched
-             to a differnet signal
+             to a different signal
         """
         try:
             current = self.inputs[self._current[idx]]
