@@ -180,12 +180,12 @@ class ThreeLevelMatrixTests(TestCase):
     recursion happens correctly""
     """
     def setUp(self):
-        self.sources1 = [make_signal(), make_signal(), make_signal()]
-        self.m1 = Matrix("m1", Mock(), self.sources1, 2)
-        # Share the middle source on both leaf matricies
-        self.sources2 = [self.sources1[1], make_signal()]
+        self.sources1 = [make_signal("s1-0"), make_signal("s1-1"), make_signal("s1-2")]
+        self.m1 = Matrix("m1", Mock(), self.sources1, 2) 
+        # Share the middle source on both leaf matrices
+        self.sources2 = [self.sources1[1], make_signal("s2-0")] #src[1],unique
         self.m2 = Matrix("m2", Mock(), self.sources2, 2)
-        self.sources3 = [make_signal(), make_signal()]
+        self.sources3 = [make_signal("s3-0"), make_signal("s3-1")]
         self.m3 = Matrix("m3", Mock(), self.sources3, 2)
         self.n1 = Matrix("n1",
                          Mock(),
@@ -231,3 +231,38 @@ class ThreeLevelMatrixTests(TestCase):
         self.assertEqual(self.root_m.outputs[0].uuid, self.sources1[0].uuid)
         self.m1.replug_input(0, self.sources3[-1])
         self.assertEqual(self.root_m.outputs[0].uuid, self.sources3[-1].uuid)
+
+    def common_setup_for_replugging_tests(self):
+        new_sources2 = [make_signal("ns2-0"), make_signal("ns2-1")]
+        self.m2.replug_input(0, new_sources2[0])
+        self.m2.replug_input(1, new_sources2[1])
+        self.n2.replug_input(2, make_signal("ns3-0"))
+        return new_sources2
+
+    def test_available_sources_when_midlevel_input_is_changed(self):
+        new_sources2 = self.common_setup_for_replugging_tests()
+        available_src1 = self.root_m.available_sources
+        for s in new_sources2:
+            self.assertIn(s, available_src1)
+        self.assertNotIn(self.sources2[-1], available_src1)
+
+    def test_available_sources_when_new_matrix_is_added(self):
+        new_sources2 = self.common_setup_for_replugging_tests()
+        sources_x1 = [make_signal("x1-0"), make_signal("x1-1")]
+        x1 = Matrix("x1", Mock(), sources_x1, 1)
+        self.n1.replug_input(len(self.m1.outputs), x1.outputs[0])
+        available_src2 = self.root_m.available_sources
+        for s in new_sources2:
+            self.assertNotIn(s, available_src2)
+        self.assertNotIn(self.sources2[-1], available_src2)
+        for s in sources_x1:
+            self.assertIn(s, available_src2)
+
+    def test_root_output_when_matrix_connection_are_changed_and_outputs_selected(self):
+        new_sources2 = self.common_setup_for_replugging_tests()
+        self.root_m.select(1, new_sources2[1])
+        sources_x1 = [make_signal("x1-0"), make_signal("x1-1")]
+        x1 = Matrix("x1", Mock(), sources_x1, 1)
+        x1.select(0, sources_x1[0])
+        self.n1.replug_input(len(self.m1.outputs), x1.outputs[0])
+        self.assertEqual(self.root_m.outputs[1].source, sources_x1[0])

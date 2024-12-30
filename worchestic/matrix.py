@@ -35,6 +35,8 @@ class MatrixOutput:
 
     def connected_to(self, sink):
         self.connection = sink
+        if sink:
+            sink.source_changed(self._source)
 
     def _source_changed(self, source):
         if self._source is not source:
@@ -113,7 +115,8 @@ class Matrix:
                  nr_outputs: int):
         self.name = name
         self._driver = driver
-        self.inputs = inputs
+        self.inputs = inputs[:] # Take a shallow copy, to avoid surprises
+                                # when repluging inputs
         self.outputs = [None] * nr_outputs
         self._current = {}
         for idx in range(nr_outputs):
@@ -167,6 +170,10 @@ class Matrix:
         """Changes the input found on a source"""
         self._input_changed(idx, source)
         self.inputs[idx] = source
+        # Propagate the change to the output, and it
+        # should notify us of it's connected signal
+        if isinstance(source, MatrixOutput):
+            source.connected_to(self.Input(self, idx))
 
     def select(self, idx, source: Source):
         """Sets output (idx) to connect to source
