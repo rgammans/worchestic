@@ -4,7 +4,7 @@ from contextlib import suppress
 from dataclasses import dataclass
 from typing import Union, ForwardRef
 from .signals import Source, Sink
-from atomicx import AtomicInt
+from .atomics import AtomicInt
 import logging
 
 logger = logging.getLogger(__name__)
@@ -86,7 +86,7 @@ class MatrixOutput:
 
 
 class MatrixDriver:
-    def select(input: int, output: int):
+    def select(self, input: int, output: int):
         raise NotImplementedError()
 
 
