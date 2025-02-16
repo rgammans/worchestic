@@ -1,7 +1,7 @@
 [project]
 name = "worchestic"
 description = "A generic controller for a switch fabric"
-version = "0.2.6"
+version = "0.3.0"
 readme = "README.rst"
 license = {file = "LICENSE"}
 authors = [
