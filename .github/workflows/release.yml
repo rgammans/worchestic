@@ -17,6 +17,9 @@ jobs:
     steps:
     - name: Install the packaging-related tools
       run: python3 -m pip install build twine
+    ## Workarounds for https://github.com/pypa/twine/issues/1216
+    - name: Update Packaging
+      run: python3 -m pip install -U packaging
     - name: Checkout the repo
       uses: actions/checkout@v2
     - name: Build the wheel
