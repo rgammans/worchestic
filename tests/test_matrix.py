@@ -86,7 +86,7 @@ class SimpleMatrixTests(TestCase):
 
     def test_select_on_single_matrix_calls_the_driver(self):
         self.m.select(1, self.sources[0])
-        self.driver.select.assert_called_with(1, 0)
+        self.driver.select.assert_called_with(0, 1)
 
     def test_can_construct_matrix_cascades(self):
         sources2 = [make_signal(), make_signal()]
@@ -127,24 +127,24 @@ class TwoLevelMatrixTests(TestCase):
         # is valid but it depends on the routing algo which one
         # is actually chosen - the current code chooses (0,0)
         self.root_m._driver.select.assert_called_with(0, 0)
-        self.m1._driver.select.assert_called_with(0, 1)
+        self.m1._driver.select.assert_called_with(1, 0)
 
     def test_selecting_a_second_source_doesnt_reuse_a_path(self):
         self.root_m.select(0, self.sources1[1])
         self.root_m._driver.select.assert_called_with(0, 0)
-        self.m1._driver.select.assert_called_with(0, 1)
+        self.m1._driver.select.assert_called_with(1, 0)
         self.root_m.select(1, self.sources1[0])
         self.root_m._driver.select.assert_called_with(1, 1)
-        self.m1._driver.select.assert_called_with(1, 0)
+        self.m1._driver.select.assert_called_with(0, 1)
 
     def tie_up_m1(self):
         # Tie up all the outputs from _m1.
         self.root_m.select(0, self.sources1[1])
         self.root_m._driver.select.assert_called_with(0, 0)
-        self.m1._driver.select.assert_called_with(0, 1)
+        self.m1._driver.select.assert_called_with(1, 0)
         self.root_m.select(1, self.sources1[0])
         self.root_m._driver.select.assert_called_with(1, 1)
-        self.m1._driver.select.assert_called_with(1, 0)
+        self.m1._driver.select.assert_called_with(0, 1)
 
     def test_selecting_an_unroutable_source_raises_an_exception(self):
         self.tie_up_m1()

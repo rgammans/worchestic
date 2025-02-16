@@ -196,7 +196,7 @@ class Matrix:
             logger.info(f"({self})Using output {route.path}({route.path_len}) "
                         f"for {idx}")
             route.path.select(route.source)
-        self._driver.select(idx, route.input_idx)
+        self._driver.select(route.input_idx, idx)
         self._current[idx] = route.input_idx
 
     def release(self, idx):
