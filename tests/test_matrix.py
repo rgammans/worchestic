@@ -232,22 +232,22 @@ class ThreeLevelMatrixTests(TestCase):
         self.m1.replug_input(0, self.sources3[-1])
         self.assertEqual(self.root_m.outputs[0].uuid, self.sources3[-1].uuid)
 
-    def common_setup_for_replugging_tests(self):
+    def common_setup_for_re_plugging_tests(self):
         new_sources2 = [make_signal("ns2-0"), make_signal("ns2-1")]
         self.m2.replug_input(0, new_sources2[0])
         self.m2.replug_input(1, new_sources2[1])
         self.n2.replug_input(2, make_signal("ns3-0"))
         return new_sources2
 
-    def test_available_sources_when_midlevel_input_is_changed(self):
-        new_sources2 = self.common_setup_for_replugging_tests()
+    def test_available_sources_when_mid_level_input_is_changed(self):
+        new_sources2 = self.common_setup_for_re_plugging_tests()
         available_src1 = self.root_m.available_sources
         for s in new_sources2:
             self.assertIn(s, available_src1)
         self.assertNotIn(self.sources2[-1], available_src1)
 
     def test_available_sources_when_new_matrix_is_added(self):
-        new_sources2 = self.common_setup_for_replugging_tests()
+        new_sources2 = self.common_setup_for_re_plugging_tests()
         sources_x1 = [make_signal("x1-0"), make_signal("x1-1")]
         x1 = Matrix("x1", Mock(), sources_x1, 1)
         self.n1.replug_input(len(self.m1.outputs), x1.outputs[0])
@@ -259,7 +259,7 @@ class ThreeLevelMatrixTests(TestCase):
             self.assertIn(s, available_src2)
 
     def test_root_output_when_matrix_connection_are_changed_and_outputs_selected(self):
-        new_sources2 = self.common_setup_for_replugging_tests()
+        new_sources2 = self.common_setup_for_re_plugging_tests()
         self.root_m.select(1, new_sources2[1])
         sources_x1 = [make_signal("x1-0"), make_signal("x1-1")]
         x1 = Matrix("x1", Mock(), sources_x1, 1)

@@ -116,7 +116,7 @@ class Matrix:
         self.name = name
         self._driver = driver
         self.inputs = inputs[:] # Take a shallow copy, to avoid surprises
-                                # when repluging inputs
+                                # when re-plugging inputs
         self.outputs = [None] * nr_outputs
         self._current = {}
         for idx in range(nr_outputs):

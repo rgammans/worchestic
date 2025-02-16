@@ -27,7 +27,7 @@ class Source:
     def reset_registry(kls):
         """Forget all previous;y created monitors.
 
-        mostly useful of ensuring tests are indepedent
+        mostly useful of ensuring tests are independent
         """
         kls._registry = {}
 
